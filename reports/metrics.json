@@ -1,0 +1,226 @@
+{
+  "dataset": {
+    "rows": 284807,
+    "fraud_cases": 492,
+    "fraud_rate": 0.001727
+  },
+  "split": {
+    "method": "stratified random 60/20/20",
+    "seed": 42,
+    "train": {
+      "rows": 170884,
+      "fraud": 295
+    },
+    "validation": {
+      "rows": 56961,
+      "fraud": 98
+    },
+    "test": {
+      "rows": 56962,
+      "fraud": 99
+    }
+  },
+  "threshold_rule": "maximise F1 on the validation split",
+  "selection_rule": "highest validation PR AUC",
+  "selected": {
+    "model": "xgboost",
+    "balancing": "class_weight"
+  },
+  "results": [
+    {
+      "model": "logreg",
+      "balancing": "smote",
+      "threshold": 1.0,
+      "validation": {
+        "pr_auc": 0.6857,
+        "roc_auc": 0.9787,
+        "precision": 0.8605,
+        "recall": 0.7551,
+        "f1": 0.8043,
+        "confusion_matrix": {
+          "tn": 56851,
+          "fp": 12,
+          "fn": 24,
+          "tp": 74
+        }
+      },
+      "test": {
+        "pr_auc": 0.7636,
+        "roc_auc": 0.9657,
+        "precision": 0.8876,
+        "recall": 0.798,
+        "f1": 0.8404,
+        "confusion_matrix": {
+          "tn": 56853,
+          "fp": 10,
+          "fn": 20,
+          "tp": 79
+        }
+      }
+    },
+    {
+      "model": "logreg",
+      "balancing": "class_weight",
+      "threshold": 1.0,
+      "validation": {
+        "pr_auc": 0.6857,
+        "roc_auc": 0.9806,
+        "precision": 0.8605,
+        "recall": 0.7551,
+        "f1": 0.8043,
+        "confusion_matrix": {
+          "tn": 56851,
+          "fp": 12,
+          "fn": 24,
+          "tp": 74
+        }
+      },
+      "test": {
+        "pr_auc": 0.7575,
+        "roc_auc": 0.9662,
+        "precision": 0.8864,
+        "recall": 0.7879,
+        "f1": 0.8342,
+        "confusion_matrix": {
+          "tn": 56853,
+          "fp": 10,
+          "fn": 21,
+          "tp": 78
+        }
+      }
+    },
+    {
+      "model": "random_forest",
+      "balancing": "smote",
+      "threshold": 0.535583,
+      "validation": {
+        "pr_auc": 0.8185,
+        "roc_auc": 0.9712,
+        "precision": 0.8837,
+        "recall": 0.7755,
+        "f1": 0.8261,
+        "confusion_matrix": {
+          "tn": 56853,
+          "fp": 10,
+          "fn": 22,
+          "tp": 76
+        }
+      },
+      "test": {
+        "pr_auc": 0.8811,
+        "roc_auc": 0.9703,
+        "precision": 0.8804,
+        "recall": 0.8182,
+        "f1": 0.8482,
+        "confusion_matrix": {
+          "tn": 56852,
+          "fp": 11,
+          "fn": 18,
+          "tp": 81
+        }
+      }
+    },
+    {
+      "model": "random_forest",
+      "balancing": "class_weight",
+      "threshold": 0.409665,
+      "validation": {
+        "pr_auc": 0.7917,
+        "roc_auc": 0.9506,
+        "precision": 0.8916,
+        "recall": 0.7551,
+        "f1": 0.8177,
+        "confusion_matrix": {
+          "tn": 56854,
+          "fp": 9,
+          "fn": 24,
+          "tp": 74
+        }
+      },
+      "test": {
+        "pr_auc": 0.875,
+        "roc_auc": 0.9771,
+        "precision": 0.931,
+        "recall": 0.8182,
+        "f1": 0.871,
+        "confusion_matrix": {
+          "tn": 56857,
+          "fp": 6,
+          "fn": 18,
+          "tp": 81
+        }
+      }
+    },
+    {
+      "model": "xgboost",
+      "balancing": "smote",
+      "threshold": 0.902857,
+      "validation": {
+        "pr_auc": 0.8006,
+        "roc_auc": 0.9793,
+        "precision": 0.9259,
+        "recall": 0.7653,
+        "f1": 0.838,
+        "confusion_matrix": {
+          "tn": 56857,
+          "fp": 6,
+          "fn": 23,
+          "tp": 75
+        }
+      },
+      "test": {
+        "pr_auc": 0.8659,
+        "roc_auc": 0.9796,
+        "precision": 0.9205,
+        "recall": 0.8182,
+        "f1": 0.8663,
+        "confusion_matrix": {
+          "tn": 56856,
+          "fp": 7,
+          "fn": 18,
+          "tp": 81
+        }
+      }
+    },
+    {
+      "model": "xgboost",
+      "balancing": "class_weight",
+      "threshold": 0.823637,
+      "validation": {
+        "pr_auc": 0.8271,
+        "roc_auc": 0.9818,
+        "precision": 0.9157,
+        "recall": 0.7755,
+        "f1": 0.8398,
+        "confusion_matrix": {
+          "tn": 56856,
+          "fp": 7,
+          "fn": 22,
+          "tp": 76
+        }
+      },
+      "test": {
+        "pr_auc": 0.8707,
+        "roc_auc": 0.9709,
+        "precision": 0.9524,
+        "recall": 0.8081,
+        "f1": 0.8743,
+        "confusion_matrix": {
+          "tn": 56859,
+          "fp": 4,
+          "fn": 19,
+          "tp": 80
+        }
+      }
+    }
+  ],
+  "versions": {
+    "python": "3.11.0",
+    "scikit-learn": "1.9.1",
+    "imbalanced-learn": "0.14.2",
+    "xgboost": "3.2.0",
+    "pandas": "3.0.6",
+    "numpy": "2.4.6",
+    "matplotlib": "3.11.2"
+  }
+}
