@@ -13,6 +13,7 @@ import sys
 from pathlib import Path
 
 import imblearn
+import joblib
 import matplotlib
 import numpy as np
 import pandas as pd
@@ -38,6 +39,8 @@ FEATURES = ["Time"] + [f"V{i}" for i in range(1, 29)] + ["Amount"]
 ROOT = Path(__file__).resolve().parent
 REPORTS_DIR = ROOT / "reports"
 DOCS_DIR = ROOT / "docs"
+MODELS_DIR = ROOT / "models"
+PIPELINE_PATH = MODELS_DIR / "fraud_pipeline.joblib"
 
 
 def load_data():
@@ -153,7 +156,7 @@ def main():
     X_train, X_val, X_test, y_train, y_val, y_test = split(X, y)
     pos_weight = float((y_train == 0).sum() / (y_train == 1).sum())
 
-    results, test_scores = [], {}
+    results, test_scores, pipelines = [], {}, {}
     for name in MODELS:
         for balancing in BALANCING:
             pipe = build_pipeline(make_model(name, balancing, pos_weight), balancing)
@@ -169,6 +172,7 @@ def main():
                 "test": evaluate(y_test, scores, threshold),
             })
             test_scores[(name, balancing)] = scores
+            pipelines[(name, balancing)] = pipe
             print(f"{name:14s} {balancing:13s} val PR AUC {results[-1]['validation']['pr_auc']:.4f}"
                   f"  test PR AUC {results[-1]['test']['pr_auc']:.4f}")
 
@@ -206,7 +210,17 @@ def main():
     (REPORTS_DIR / "metrics.json").write_text(json.dumps(metrics, indent=2) + "\n")
     DOCS_DIR.mkdir(exist_ok=True)
     plot_pr_curves(y_test, test_scores, DOCS_DIR / "pr_curve.png")
-    print(f"selected: {selected['model']} + {selected['balancing']}")
+
+    # The saved bundle carries the whole fitted pipeline (scaler included) and its threshold.
+    MODELS_DIR.mkdir(exist_ok=True)
+    joblib.dump({
+        "pipeline": pipelines[(selected["model"], selected["balancing"])],
+        "threshold": selected["threshold"],
+        "features": FEATURES,
+        "model": selected["model"],
+        "balancing": selected["balancing"],
+    }, PIPELINE_PATH)
+    print(f"selected: {selected['model']} + {selected['balancing']} -> {PIPELINE_PATH}")
 
 
 if __name__ == "__main__":

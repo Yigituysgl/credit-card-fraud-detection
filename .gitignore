@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Data: download creditcard.csv yourself (see README)
+creditcard.csv
+test_data.csv
+
+# Trained models: produced by train.py
+models/
+*.pkl
+*.joblib
