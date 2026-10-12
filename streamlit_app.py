@@ -1,68 +1,78 @@
-import streamlit as st
-import pandas as pd
+"""Transaction replay demo.
+
+Steps through a fixed sample of held-out test transactions (data/demo_transactions.csv,
+written by train.py) and scores each one with the saved pipeline and its
+validation-tuned threshold. This is a replay of historical data, not a live stream.
+"""
+from pathlib import Path
+
 import joblib
-import time
+import pandas as pd
+import streamlit as st
+
+ROOT = Path(__file__).resolve().parent
+PIPELINE_PATH = ROOT / "models" / "fraud_pipeline.joblib"
+DEMO_PATH = ROOT / "data" / "demo_transactions.csv"
 
 
-if "fraud_count" not in st.session_state:
-    st.session_state.fraud_count = 0
-if "normal_count" not in st.session_state:
-    st.session_state.normal_count = 0
-model = joblib.load("fraud_rf_model.pkl")
+@st.cache_resource
+def load_bundle():
+    return joblib.load(PIPELINE_PATH)
 
 
 @st.cache_data
-def load_data():
-    return pd.read_csv("test_data.csv")  
-
-df = load_data()
-current_index = st.session_state.get('index', 0)
+def load_demo():
+    return pd.read_csv(DEMO_PATH)
 
 
-st.title("💳 Real-Time Fraud Detection")
-st.write("Simulating incoming transactions and predicting fraud status.")
-st.subheader("📊 Live Summary")
-col1, col2 = st.columns(2)
-col1.metric("🚨 Fraud Detected", st.session_state.fraud_count)
-col2.metric("✅ Normal Transactions", st.session_state.normal_count)
+st.title("💳 Fraud Detection – Transaction Replay Demo")
+st.write(
+    "Replays held-out test transactions one at a time and scores them with the saved "
+    "pipeline. Historical data only; no live stream."
+)
 
+if not PIPELINE_PATH.exists() or not DEMO_PATH.exists():
+    st.error("Model or demo data missing. Run `python train.py` first (see README).")
+    st.stop()
 
-if st.button("Next Transaction"):
-    if current_index < len(df):
-        row = df.iloc[current_index]
-        X = row.drop('Class')
-        y_true = row['Class']
+bundle = load_bundle()
+pipeline, threshold, features = bundle["pipeline"], bundle["threshold"], bundle["features"]
+df = load_demo()
 
-        
-        with st.spinner("Processing transaction..."):
-            time.sleep(1)  
+for key in ("index", "tp", "fp", "fn", "tn"):
+    st.session_state.setdefault(key, 0)
 
-        risk_score = model.predict_proba([X])[0][1]
-            
+st.caption(
+    f"Model: {bundle['model']} + {bundle['balancing']} · "
+    f"decision threshold {threshold:.4f} (tuned on the validation split)"
+)
 
-        
-        y_pred = model.predict([X])[0]
+if st.button("Next transaction"):
+    i = st.session_state.index
+    if i < len(df):
+        row = df.iloc[[i]]
+        risk = float(pipeline.predict_proba(row[features])[0, 1])
+        flagged = risk >= threshold
+        actual = int(row["Class"].iloc[0])
 
-        
-        st.write(f"### Transaction #{current_index + 1}")
-        st.dataframe(pd.DataFrame([X]))
+        outcome = {(True, 1): "tp", (True, 0): "fp", (False, 1): "fn", (False, 0): "tn"}
+        st.session_state[outcome[(flagged, actual)]] += 1
+        st.session_state.index = i + 1
 
-        if y_pred == 1:
-            st.error("🚨 **FRAUD DETECTED!**")
-            st.session_state.fraud_count += 1
+        st.write(f"### Transaction {i + 1} of {len(df)}")
+        st.dataframe(row[features], hide_index=True)
+        if flagged:
+            st.error(f"🚨 Flagged as fraud (score {risk:.4f})")
         else:
-            st.success("✅ Not Fraud")
-            st.session_state.normal_count += 1
-
-        st.caption(f"Actual Label: {int(y_true)}")
-        st.caption(f"Model confidence (fraud risk): {risk_score:.2%}")
-
-        
-        st.session_state.index = current_index + 1
-        progress = (current_index + 1) / len(df)
-        st.progress(progress)
-
+            st.success(f"✅ Not flagged (score {risk:.4f})")
+        st.caption(f"Actual label: {'fraud' if actual else 'normal'}")
     else:
-        st.info("✅ All transactions have been processed.")
+        st.info("All demo transactions have been replayed.")
 
-
+st.subheader("Running tally")
+c1, c2, c3, c4 = st.columns(4)
+c1.metric("Fraud caught (TP)", st.session_state.tp)
+c2.metric("False alarms (FP)", st.session_state.fp)
+c3.metric("Fraud missed (FN)", st.session_state.fn)
+c4.metric("Normal passed (TN)", st.session_state.tn)
+st.progress(st.session_state.index / len(df))

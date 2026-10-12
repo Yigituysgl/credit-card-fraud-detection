@@ -41,6 +41,8 @@ REPORTS_DIR = ROOT / "reports"
 DOCS_DIR = ROOT / "docs"
 MODELS_DIR = ROOT / "models"
 PIPELINE_PATH = MODELS_DIR / "fraud_pipeline.joblib"
+DEMO_PATH = ROOT / "data" / "demo_transactions.csv"
+DEMO_FRAUD, DEMO_NORMAL = 30, 170
 
 
 def load_data():
@@ -151,6 +153,17 @@ def plot_pr_curves(y_test, test_scores, path):
     plt.close(fig)
 
 
+def write_demo_csv(X_test, y_test, path):
+    """Sample of the held-out test split for the replay demo, with real fraud cases."""
+    test = X_test.assign(**{TARGET: y_test})
+    demo = pd.concat([
+        test[test[TARGET] == 1].sample(DEMO_FRAUD, random_state=SEED),
+        test[test[TARGET] == 0].sample(DEMO_NORMAL, random_state=SEED),
+    ]).sample(frac=1, random_state=SEED)
+    path.parent.mkdir(exist_ok=True)
+    demo.to_csv(path, index=False)
+
+
 def main():
     X, y = load_data()
     X_train, X_val, X_test, y_train, y_val, y_test = split(X, y)
@@ -220,6 +233,7 @@ def main():
         "model": selected["model"],
         "balancing": selected["balancing"],
     }, PIPELINE_PATH)
+    write_demo_csv(X_test, y_test, DEMO_PATH)
     print(f"selected: {selected['model']} + {selected['balancing']} -> {PIPELINE_PATH}")
 
 
