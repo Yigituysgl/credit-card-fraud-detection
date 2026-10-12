@@ -180,7 +180,7 @@ def main():
             results.append({
                 "model": name,
                 "balancing": balancing,
-                "threshold": round(threshold, 6),
+                "threshold": threshold,
                 "validation": evaluate(y_val, val_scores, threshold),
                 "test": evaluate(y_test, scores, threshold),
             })

@@ -30,7 +30,7 @@
     {
       "model": "logreg",
       "balancing": "smote",
-      "threshold": 1.0,
+      "threshold": 0.9999999992134918,
       "validation": {
         "pr_auc": 0.6857,
         "roc_auc": 0.9787,
@@ -61,7 +61,7 @@
     {
       "model": "logreg",
       "balancing": "class_weight",
-      "threshold": 1.0,
+      "threshold": 0.9999999980336132,
       "validation": {
         "pr_auc": 0.6857,
         "roc_auc": 0.9806,
@@ -92,7 +92,7 @@
     {
       "model": "random_forest",
       "balancing": "smote",
-      "threshold": 0.535583,
+      "threshold": 0.5355833333333334,
       "validation": {
         "pr_auc": 0.8185,
         "roc_auc": 0.9712,
@@ -123,7 +123,7 @@
     {
       "model": "random_forest",
       "balancing": "class_weight",
-      "threshold": 0.409665,
+      "threshold": 0.4096653556382796,
       "validation": {
         "pr_auc": 0.7917,
         "roc_auc": 0.9506,
@@ -154,7 +154,7 @@
     {
       "model": "xgboost",
       "balancing": "smote",
-      "threshold": 0.902857,
+      "threshold": 0.902856707572937,
       "validation": {
         "pr_auc": 0.8006,
         "roc_auc": 0.9793,
@@ -185,7 +185,7 @@
     {
       "model": "xgboost",
       "balancing": "class_weight",
-      "threshold": 0.823637,
+      "threshold": 0.8236374855041504,
       "validation": {
         "pr_auc": 0.8271,
         "roc_auc": 0.9818,
